@@ -1,0 +1,50 @@
+import {getCourse,PAISE} from "./courses";
+import {applicationSchema,createRef,db,digest,editSchema,lookup,newToken} from "./enrollment";
+
+export const REVIEW_STATES=["submitted","under_review","accepted","declined"] as const;
+export const reviewLabels:Record<string,string>={submitted:"Submitted",under_review:"Under review",accepted:"Accepted",declined:"Declined"};
+export type RecordRow={id:string;slug:string;batch:string;name:string;email:string;college:string;created_at:string;review_state:string;payment_state:string;payment_id:string|null};
+export const accessCookie="scs_application";
+export const refPattern=/^SCS-[A-F0-9]{20}$/;
+export const codePattern=/^[a-f0-9]{64}$/;
+
+export async function createApplication(input:unknown) {
+ const p=applicationSchema.safeParse(input);
+ if(!p.success)return {error:"invalid" as const,status:400};
+ const c=await lookup(p.data.slug);
+ if(!c||c.status==="closed")return {error:"closed" as const,status:409};
+ const id=createRef(),token=newToken(),a=p.data;
+ const r=await db().prepare("INSERT INTO applications (id,token_hash,slug,batch,name,email,college,created_at,amount) SELECT ?,?,?,?,?,?,?,?,? WHERE COALESCE((SELECT status FROM course_settings WHERE slug=?),'soon') IN ('soon','open') AND COALESCE((SELECT batch FROM course_settings WHERE slug=?),'batch-1')=? ON CONFLICT(slug,batch,email) DO NOTHING").bind(id,await digest(token),a.slug,c.batch,a.name,a.email,a.college,new Date().toISOString(),PAISE,a.slug,a.slug,c.batch).run();
+ if(!r.meta.changes){const current=await lookup(a.slug);if(current?.status==="closed"||current?.batch!==c.batch)return {error:"closed" as const,status:409};return {error:"duplicate" as const,status:409};}
+ return {id,token,status:201};
+}
+
+export async function saveCourse(slug:string,input:unknown){
+ const p=editSchema.safeParse(input);
+ if(!getCourse(slug)||!p.success)return "invalid";
+ const a=p.data;
+ if(a.status==="open"&&(!a.schedule||!a.mode))return "schedule";
+ await db().prepare("INSERT INTO course_settings (slug,title,blurb,outcome,days,schedule,mode,batch,status) VALUES (?,?,?,?,?,?,?,?,?) ON CONFLICT(slug) DO UPDATE SET title=excluded.title,blurb=excluded.blurb,outcome=excluded.outcome,days=excluded.days,schedule=excluded.schedule,mode=excluded.mode,batch=excluded.batch,status=excluded.status").bind(slug,a.title,a.blurb,a.outcome,JSON.stringify(a.days),a.schedule,a.mode,a.batch,a.status).run();
+ return null;
+}
+
+export async function listApplications(slug="",page=1){
+ const match=slug&&getCourse(slug)?slug:"";
+ const result=await db().prepare("SELECT id,slug,batch,name,email,college,created_at,review_state,payment_state,payment_id FROM applications WHERE (?='' OR slug=?) ORDER BY created_at DESC,id DESC LIMIT 51 OFFSET ?").bind(match,match,(page-1)*50).all<RecordRow>();
+ return {rows:result.results.slice(0,50),next:result.results.length>50};
+}
+
+export async function updateReview(id:string,status:string){
+ if(!refPattern.test(id)||!REVIEW_STATES.some(x=>x===status))return false;
+ const r=await db().prepare("UPDATE applications SET review_state=? WHERE id=?").bind(status,id).run();
+ return r.meta.changes===1;
+}
+
+const columns=["id","slug","batch","name","email","college","created_at","review_state","payment_state","payment_id"] as const;
+function cell(value:unknown){
+ let s=String(value??"");
+ if(/^\s*[=+\-@]/.test(s)||/^[\r\t\n]/.test(s))s="'"+s;
+ return '"'+s.replace(/"/g,'""')+'"';
+}
+export function csv(rows:RecordRow[]){return rows.map(row=>columns.map(k=>cell(row[k])).join(",")).join("\r\n");}
+export const csvHeader=columns.join(",");

@@ -1,0 +1,1 @@
+ALTER TABLE `applications` ADD `review_state` text DEFAULT 'submitted' NOT NULL;

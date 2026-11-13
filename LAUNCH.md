@@ -1,0 +1,9 @@
+# GL Bajaj CSAI short-term course launch
+
+- The site starts with 25 five-day courses across five subject tracks at ₹2,500 each. **Batch announcement soon** accepts no-payment pre-applications. **Applications open** accepts applications for a scheduled batch. **Applications closed** blocks new submissions.
+- Sign in with the owner's ChatGPT account and open /admin. Load a course, edit its schedule, delivery mode, syllabus and status, then save. Keep the same batch identifier when announcing a course that already has pre-applications. Use a new identifier for a new cohort.
+- The admin can filter student applications by course, review them and download the displayed page as CSV. An acceptance records the admin's decision. It does not collect a fee or send an email.
+- A submitted form gives the student a reference and private tracking code. The student can use both on /apply to recover the status page on another device. Do not share the tracking code.
+- This Site remains private until its owner changes the audience. Review the organiser's contact and refund information before opening paid enrollment to outside students.
+- Razorpay is optional. Do not put credentials in source or chat. When ready, configure RAZORPAY_KEY_ID, RAZORPAY_KEY_SECRET, RAZORPAY_WEBHOOK_SECRET and PAYMENTS_MODE=test or live as server settings. Use matching test keys first and configure payment.captured at /api/payments/webhook. Check which methods are enabled in the merchant dashboard. Checkout is separate from application submission and a captured payment must be verified on the server.
+- SITE_ADMIN_EMAIL identifies the owner's ChatGPT account for the admin interface. D1 stores courses and applications. Native links and forms handle the catalog, applications, tracking, admin editing, review and CSV export.
