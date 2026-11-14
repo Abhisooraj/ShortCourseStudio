@@ -32,6 +32,8 @@ export default async function Page({searchParams}:{searchParams:Promise<{course?
     <dd>Paid ₹2,000 after ₹500 off</dd>
     <dt>Referrer · Sample Student A</dt>
     <dd>₹500 wallet credit available for the next eligible course</dd>
+    <dt>Referral code status</dt>
+    <dd>Closed after one successful referral</dd>
    </dl>
   </article>
  </section>
