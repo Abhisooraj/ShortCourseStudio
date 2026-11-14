@@ -1,3 +1,4 @@
+import { listReferrals, referralStatus } from "@/lib/referrals";
 import {headers} from "next/headers";
 import {Frame} from "@/app/ui";
 import {chatGPTSignInPath} from "@/app/chatgpt-auth";
@@ -16,26 +17,20 @@ export default async function Page({searchParams}:{searchParams:Promise<{course?
  const page=typeof p.page==="string"&&/^[1-9][0-9]{0,4}$/.test(p.page)?Number(p.page):1;
  const {rows,next}=await listApplications(filter,page);
  const mode=paymentMode();
+ const referrals=await listReferrals();
  const link=(page:number)=>"/admin?"+query({course:c.slug,filter,page:String(page)})+"#applications";
  const ok=p.message==="saved"||p.message==="reviewed";
  return <Frame><section className="wrap catalog prose"><span className="eyebrow"><i/> COURSE MANAGEMENT</span><h1>Short Course Studio administration</h1><p>Edit course details and review student applications. Checkout is {mode==="live"?"live":mode==="test"?"in test mode":"not configured"}.</p>
  {p.message&&messages[p.message]&&<p role={ok?"status":"alert"} className={ok?"success":"error"}>{messages[p.message]}</p>}
  <section id="referrals" className="panel formpanel" aria-labelledby="referrals-heading">
   <h2 id="referrals-heading">Student referrals</h2>
-  <p>Policy preview with sample data. Checkout discounts are disabled.</p>
-  <p>Each eligible student saves ₹500 on a ₹2,500 course. The discounted fee is ₹2,000.</p>
-  <article className="app-record">
-   <h3>Example referral</h3>
-   <p>Qualifying course: {c.title}</p>
-   <dl>
-    <dt>Referred student · Sample Student B</dt>
-    <dd>Paid ₹2,000 after ₹500 off</dd>
-    <dt>Referrer · Sample Student A</dt>
-    <dd>₹500 wallet credit available for the next eligible course</dd>
-    <dt>Referral code status</dt>
-    <dd>Closed after one successful referral</dd>
-   </dl>
-  </article>
+  {referrals.length===0?<p>No referral codes issued yet.</p>:<div className="application-list">{referrals.map(referral=>
+   <article key={referral.code} className="app-record">
+    <strong>{referral.code}</strong>
+    <p>{referral.owner} · {referralStatus(referral)}</p>
+    <p>Wallet: {referral.spent_at?"₹500 used":referral.wallet_application?"₹500 reserved":referral.confirmed_at?"₹500 available":"₹0"}</p>
+   </article>
+  )}</div>}
  </section>
  <div className="admin-grid"><div>
  <form className="panel formpanel" method="get" action="/admin"><h2>Choose a course to edit</h2><input type="hidden" name="filter" value={filter}/><label>Course<select name="course" defaultValue={c.slug}>{courses.map(x=><option key={x.slug} value={x.slug}>{x.title}</option>)}</select></label><button className="btn secondary">Load course</button></form>

@@ -9,3 +9,11 @@ export const applications = sqliteTable("applications",{
  reviewState:text("review_state").notNull().default("submitted"),
  paymentState:text("payment_state").notNull().default("unpaid"),
 },t=>[uniqueIndex("applications_course_batch_email").on(t.slug,t.batch,t.email)]);
+export const referrals = sqliteTable("referrals", {
+ owner: text().primaryKey(),
+ code: text().notNull().unique(),
+ friendApplication: text("friend_application").unique().references(() => applications.id),
+ walletApplication: text("wallet_application").unique().references(() => applications.id),
+ confirmedAt: text("confirmed_at"),
+ spentAt: text("spent_at"),
+});

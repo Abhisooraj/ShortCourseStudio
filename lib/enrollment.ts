@@ -50,8 +50,13 @@ export async function gateway(path:string,body?:Record<string,unknown>){
  return await resp.json() as {id:string;order_id?:string;amount:number;currency:string;status:string};
 }
 export async function markPaid(row:Application,paymentId:string){
- if(!row.order_id||row.amount!==PAISE)return false;
+ if(!row.order_id || ![PAISE, PAISE-50_000].includes(row.amount))return false;
  const next=paymentMode()==="test"?"test_paid":"paid";
- const result=await db().prepare("UPDATE applications SET payment_id = ?, payment_state = ? WHERE id = ? AND order_id = ? AND (payment_id IS NULL OR payment_id = ?)").bind(paymentId,next,row.id,row.order_id,paymentId).run();
+ const payment=db().prepare("UPDATE applications SET payment_id = ?, payment_state = ? WHERE id = ? AND order_id = ? AND amount = ? AND (payment_id IS NULL OR payment_id = ?)").bind(paymentId,next,row.id,row.order_id,row.amount,paymentId);
+ const confirmed=db().prepare(`UPDATE referrals SET confirmed_at=COALESCE(confirmed_at,CURRENT_TIMESTAMP)
+   WHERE friend_application=? AND EXISTS (SELECT 1 FROM applications WHERE id=? AND payment_id=? AND payment_state='paid')`).bind(row.id,row.id,paymentId);
+ const spent=db().prepare(`UPDATE referrals SET spent_at=COALESCE(spent_at,CURRENT_TIMESTAMP)
+   WHERE wallet_application=? AND EXISTS (SELECT 1 FROM applications WHERE id=? AND payment_id=? AND payment_state='paid')`).bind(row.id,row.id,paymentId);
+ const [result]=await db().batch([payment,confirmed,spent]);
  return result.meta.changes===1;
 }

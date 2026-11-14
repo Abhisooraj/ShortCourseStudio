@@ -12,13 +12,15 @@ async function loadCheckout(){
  });
  if(!w.Razorpay)throw new Error("Checkout is unavailable.");return w.Razorpay;
 }
-export default function PaymentCheckout({id,token,mode}:{id:string;token:string;mode:"test"|"live"}){
+export default function PaymentCheckout({id,token,mode,verified,discountLocked}:{id:string;token:string;mode:"test"|"live";verified:boolean;discountLocked:boolean}){
  const [busy,setBusy]=useState(false),[error,setError]=useState("");
+ const [referralCode,setReferralCode]=useState("");
+ const [wallet,setWallet]=useState(false);
  const ref={id,token};
  async function start(){
   setBusy(true);setError("");
   try{
-   const o=await post<{paymentState?:string;key?:string;amount?:number;orderId?:string;course?:string}>("order",ref);
+   const o=await post<{paymentState?:string;key?:string;amount?:number;orderId?:string;course?:string}>("order",{...ref,referralCode,wallet});
    if(o.paymentState){location.reload();return;}
    const Razorpay=await loadCheckout();
    const instance=new Razorpay({key:o.key,order_id:o.orderId,amount:o.amount,currency:"INR",name:"GL Bajaj CSAI Short-Term Courses",description:o.course,theme:{color:"#174a3d"},modal:{ondismiss:()=>setBusy(false)},handler:async(payload:Record<string,string>)=>{
@@ -28,5 +30,8 @@ export default function PaymentCheckout({id,token,mode}:{id:string;token:string;
    instance.on("payment.failed",()=>{setError("Payment did not complete. Refresh the status before retrying.");setBusy(false);});instance.open();
   }catch(e){setError(e instanceof Error?e.message:"Checkout is unavailable.");setBusy(false);}
  }
- return <div>{mode==="test"&&<p>No real money is collected in test mode.</p>}<button type="button" className="btn primary" onClick={start} disabled={busy}>{mode==="test"?"Run test checkout":"Pay course fee"}</button>{error&&<p role="alert" className="error">{error}</p>}</div>;
+ return <div>{mode==="test"&&<p>No real money is collected in test mode.</p>}{mode==="live"&&!discountLocked&&<fieldset disabled={busy}><legend>Optional discount</legend>
+ <label>Referral code<input value={referralCode} onChange={e=>setReferralCode(e.target.value)} disabled={wallet} maxLength={20} autoComplete="off"/></label>
+ {verified&&<label className="check"><input type="checkbox" checked={wallet} disabled={Boolean(referralCode.trim())} onChange={e=>setWallet(e.target.checked)}/> Use ₹500 wallet credit</label>}
+ </fieldset>}<button type="button" className="btn primary" onClick={start} disabled={busy}>{mode==="test"?"Run test checkout":"Pay course fee"}</button>{error&&<p role="alert" className="error">{error}</p>}</div>;
 }

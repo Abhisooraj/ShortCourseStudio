@@ -1,7 +1,9 @@
-import { cookies } from "next/headers";
+import { studentReferral, referralStatus } from "@/lib/referrals";
+import { chatGPTSignInPath } from "@/app/chatgpt-auth";
+import { cookies, headers } from "next/headers";
 import { ArrowRight,CheckCircle2 } from "lucide-react";
 import { Badge,Frame } from "@/app/ui";
-import { feeText } from "@/lib/courses";
+import { feeText, PAISE } from "@/lib/courses";
 import { getApplication,getCourses,paymentMode } from "@/lib/enrollment";
 import { accessCookie,refPattern,reviewLabels } from "@/lib/form-workflows";
 import PaymentCheckout from "./payment-checkout";
@@ -23,6 +25,9 @@ export default async function Apply({searchParams}:{searchParams:Promise<{course
  const row=id&&id===storedId&&token?await getApplication(id,token):null;
  const selected=row?courses.find(c=>c.slug===row.slug):null;
  const mode=paymentMode();
+ const h=await headers();
+ const verified=Boolean(row && h.get("oai-authenticated-user-id") && h.get("oai-authenticated-user-email")?.toLowerCase()===row.email);
+ const referral=row && verified ? await studentReferral(row) : null;
  const payable=!!mode&&selected?.status==="open"&&selected.batch===row?.batch&&row?.review_state!=="declined"&&row?.payment_state==="unpaid";
  return <Frame><section className="wrap narrow prose"><span className="eyebrow"><i/> STUDENT APPLICATIONS</span><h1>{row?"Application status":"Apply for a short course"}</h1><p>{row?"Keep your reference and tracking code to check this application again.":"Choose a course below. For upcoming batches, you can pre-apply without paying or reserving a seat."}</p>
  {p.error&&errors[p.error]&&<p role="alert" className="error">{errors[p.error]}</p>}
@@ -30,7 +35,14 @@ export default async function Apply({searchParams}:{searchParams:Promise<{course
    <span className="mini"><CheckCircle2 size={21}/></span><h2>Application received</h2>
    <p>{selected?.title} · Batch {row.batch}</p>
    <dl className="receipt-details"><dt>Application reference</dt><dd className="ref">{row.id}</dd><dt>Private tracking code</dt><dd className="ref">{token}</dd><dt>Review status</dt><dd>{reviewLabels[row.review_state]??"Submitted"}</dd><dt>Payment</dt><dd>{row.payment_state==="paid"?"Payment verified":row.payment_state==="test_paid"?"Test payment verified — no real fee collected":"Not paid"}</dd></dl>
-   {payable&&token?<PaymentCheckout id={row.id} token={token} mode={mode!}/>:<p className="mutedbox">{row.payment_state==="paid"?"Your fee has been received.":row.payment_state==="test_paid"?"This was a test transaction.":!mode?"Online payment is not enabled. No payment was collected.":"Payment is not available for this application right now."}</p>}
+   {payable&&token?<PaymentCheckout id={row.id} token={token} mode={mode!} verified={verified} discountLocked={Boolean(row.order_id) || row.amount!==PAISE}/>:<p className="mutedbox">{row.payment_state==="paid"?"Your fee has been received.":row.payment_state==="test_paid"?"This was a test transaction.":!mode?"Online payment is not enabled. No payment was collected.":"Payment is not available for this application right now."}</p>}
+   {row.payment_state==="paid"&&<section aria-labelledby="my-referral">
+    <h3 id="my-referral">Your referral</h3>
+    {referral?<><label>Referral code<input readOnly value={referral.code}/></label>
+     <p>Code status: {referralStatus(referral)}</p>
+     <p>Wallet credit: {referral.spent_at?"₹500 used":referral.wallet_application?"₹500 reserved for checkout":referral.confirmed_at?"₹500 available":"₹0"}</p></>:
+     <p><a href={chatGPTSignInPath("/apply?ref="+row.id)} target="_top">Sign in with the email used for this application</a> to view your referral code.</p>}
+   </section>}
    <p>Keep your tracking code private. Submitting a form alone does not confirm a seat.</p>
    <div className="actions"><a className="btn secondary" href={"/apply?ref="+row.id}>Refresh status</a><a className="btn secondary" href="/apply">Apply for another course</a></div>
  </div>:<>
