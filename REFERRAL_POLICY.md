@@ -12,9 +12,13 @@ The standard course fee is ₹2,500. The referred student pays ₹2,000 on the q
 4. Record one redemption per student under the approved limit, covering both roles. Prevent self-referrals, duplicate redemption, overlapping checkout claims and replayed payment notifications. A failed or expired checkout releases the reservation.
 5. If the qualifying payment is refunded before the referrer's discount is redeemed, revoke the unused discount. Review refunds after redemption with the programme team before defining an automated rule.
 
+## One successful referral per student
+
+Once the referred friend’s qualifying payment is confirmed, issue ₹500 in wallet credit and permanently close the referrer’s code. Reject later attempts to use that code for another friend. A failed or expired checkout releases the reservation and leaves the code available. Retrying the same payment confirmation must never issue a second credit.
+
 ## Decision before enabling checkout
 
-The description supports two readings. Confirm whether a student may redeem ₹500 once across the entire programme or once per course. Programme-wide means a student who already redeemed as a referred student cannot earn another redeemable discount by becoming a referrer. Per-course means the same student could redeem on another eligible course, subject to the approved referral participation rule. Also confirm whether each student can make only one successful referral regardless of redemption scope.
+The description supports two readings. Confirm whether a student may redeem ₹500 once across the entire programme or once per course. Programme-wide means a student who already redeemed as a referred student cannot earn another redeemable discount by becoming a referrer. Per-course means the same student could redeem on another eligible course, subject to the approved referral participation rule.
 
 ## Admin dashboard proposal
 
