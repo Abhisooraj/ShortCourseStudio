@@ -2,13 +2,13 @@
 
 ## Offer
 
-The standard course fee is ₹2,500. Each eligible student in a qualifying referral pair receives ₹500 off one eligible purchase, bringing that purchase to ₹2,000. A student who has already paid for the current course receives their discount on a subsequent eligible course purchase.
+The standard course fee is ₹2,500. The referred student pays ₹2,000 on the qualifying course. Once that payment is confirmed, add ₹500 in course credit to the referrer’s account wallet. Apply the credit once to their next eligible course purchase, regardless of course track. A ₹2,500 course then costs ₹2,000.
 
 ## Proposed workflow
 
 1. An enrolled student shares a referral link or code with another student. The referred student enters it before checkout.
 2. Validate distinct student identities, course eligibility and prior use before quoting ₹2,000. Reserve the discount while checkout is pending.
-3. Confirm the referral only after the referred student's ₹2,000 payment succeeds. Unlock the referrer's ₹500 discount for their next eligible purchase, subject to the final redemption limit.
+3. Confirm the referral only after the referred student's ₹2,000 payment succeeds. Credit the referrer’s account wallet with ₹500 for their next eligible course purchase, subject to the final redemption limit.
 4. Record one redemption per student under the approved limit, covering both roles. Prevent self-referrals, duplicate redemption, overlapping checkout claims and replayed payment notifications. A failed or expired checkout releases the reservation.
 5. If the qualifying payment is refunded before the referrer's discount is redeemed, revoke the unused discount. Review refunds after redemption with the programme team before defining an automated rule.
 
@@ -22,4 +22,4 @@ Show referrer, referred student, qualifying course, redemption course, dates and
 
 ## Draft course promotion
 
-Refer a friend. Save ₹500 each on an eligible course purchase. A ₹2,500 course comes to ₹2,000 with the discount. Already paid for your course? Your discount can apply to a future eligible course after your friend's qualifying enrollment is confirmed. Subject to the final referral policy.
+Your friend gets ₹500 off their course. Once their payment is confirmed, you get ₹500 in your course wallet for your next eligible purchase. Subject to the final referral policy.
