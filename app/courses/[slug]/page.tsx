@@ -17,7 +17,8 @@ export default async function CoursePage({params}:{params:Promise<{slug:string}>
  <div className="course-sidebar"><aside className="outcome"><h3>Learning objectives</h3><ul>{brief.objectives.map(item=><li key={item}>{item}</li>)}</ul><h3>Final project</h3><p>{c.outcome}</p></aside><aside className="outcome"><h3>Who should attend</h3><p>{brief.audience}</p><h3>Prerequisites</h3><p>{brief.prerequisite}</p><h3>Tools &amp; resources</h3><p>{c.tools}.</p><p>{brief.resources}</p></aside>
  <section className="outcome" aria-labelledby="course-referral-heading">
   <h3 id="course-referral-heading">Refer a friend</h3>
- <p><strong>Referral offer preview.</strong> Your friend pays ₹2,000 instead of ₹2,500. After their payment is confirmed, you get ₹500 in your course wallet for your next eligible purchase. Your referral code closes after one successful referral.</p>
+ <p>Your friend saves ₹500. You get ₹500 in your course wallet after they pay.</p>
+  <p>Your code closes after one successful referral.</p>
   <p>Offer pending approval. Share this page’s link with a friend to introduce them to the course.</p>
  </section></div></section>
  </Frame>;
