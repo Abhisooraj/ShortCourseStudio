@@ -29,9 +29,9 @@ export default async function Page({searchParams}:{searchParams:Promise<{course?
    <p>Qualifying course: {c.title}</p>
    <dl>
     <dt>Referred student · Sample Student B</dt>
-    <dd>₹500 redeemed on qualifying purchase</dd>
+    <dd>Paid ₹2,000 after ₹500 off</dd>
     <dt>Referrer · Sample Student A</dt>
-    <dd>₹500 available for a future eligible course</dd>
+    <dd>₹500 wallet credit available for the next eligible course</dd>
    </dl>
   </article>
  </section>
