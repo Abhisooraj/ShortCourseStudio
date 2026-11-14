@@ -1,3 +1,4 @@
+import {facultyTemplates} from "@/lib/faculty-templates";
 import {ArrowRight,ArrowDownToLine} from "lucide-react";
 import {Badge,Facts,Frame} from "./ui";
 import {getCourses} from "@/lib/enrollment";
@@ -18,7 +19,15 @@ export default async function Home(){const courses=await getCourses();return <Fr
  <aside className="format"><span className="eyebrow">AT A GLANCE</span><h2>Programme information</h2><dl><dt>Audience</dt><dd>Undergraduate engineering and computing students</dd><dt>Daily format</dt><dd>45 min lecture · 90 min practical · 30 min review · 15 min break</dd><dt>Batch dates &amp; venue</dt><dd>To be announced for each course</dd><dt>Registration</dt><dd>Pre-apply without payment and track your application online</dd></dl></aside></div></section>
  <section className="wrap catalog" id="courses"><div className="section-head"><div><span className="eyebrow">ACADEMIC CATALOGUE</span><h2>Explore the five subject tracks</h2></div><p>Each card opens a separate five-day course with lecture topics, lab work, prerequisites and the final deliverable.</p></div>
  <nav className="subject-nav" aria-label="Jump to subject">{TRACKS.map((track,i)=><a href={"#"+ids[i]} key={track}><span>{tags[i]}</span> {["Data Analytics","DBMS","Computer Networks","COA","TOC"][i]}</a>)}</nav>
- {TRACKS.map((track,i)=><section className="track" id={ids[i]} key={track}><div className="track-heading"><span className="track-num">{String(i+1).padStart(2,"0")}</span><div><h3>{track}</h3><p>{descriptions[i]}</p></div><small>{courses.filter(c=>c.track===track).length} courses</small></div><div className="grid">{courses.filter(c=>c.track===track).map((c,j)=><a className="course" href={"/courses/"+c.slug} key={c.slug}><div className="cardtop"><span className="course-code">{tags[i]}-{String(j+1).padStart(2,"0")}</span><Badge status={c.status}/></div><h4>{c.title}</h4><p>{c.blurb}</p><div className="cardbottom"><span>{c.level}</span><strong>View syllabus <ArrowRight size={15}/></strong></div></a>)}</div></section>)}
+ {TRACKS.map((track,i)=><section className="track" id={ids[i]} key={track}><div className="track-heading"><span className="track-num">{String(i+1).padStart(2,"0")}</span><div><h3>{track}</h3><p>{descriptions[i]}</p></div><small>{courses.filter(c=>c.track===track).length} courses</small></div><div className="grid">{courses.filter(c=>c.track===track).map((c,j)=><a className="course" href={"/courses/"+c.slug} key={c.slug}><div className="cardtop"><span className="course-code">{tags[i]}-{String(j+1).padStart(2,"0")}</span><Badge status={c.status}/></div><h4>{c.title}</h4><p>{c.blurb}</p><div className="cardbottom"><span>{c.level}</span><strong>View syllabus <ArrowRight size={15}/></strong></div></a>)}</div>
+ {i<2&&<><h4>Faculty course templates</h4><div className="grid">{facultyTemplates.filter(item=>item.subject===(i===0?"Data Analytics":"Database Management System")).map(item=>
+  <a className="course" key={item.slug} href={"/faculty-courses/"+item.slug}>
+   <h4>{item.subject} by {item.instructor}</h4>
+   <p>5 days · 3 hours per day · 15 hours total</p>
+   <div className="cardbottom"><strong>View course template <ArrowRight size={15}/></strong></div>
+  </a>
+ )}</div></>}
+ </section>)}
  </section>
  <section className="programme" id="programme"><div className="wrap programme-grid"><section><span className="eyebrow">DEPARTMENTS</span><h2>{DEPARTMENT}</h2><p>{DEPARTMENT_ABOUT}</p><a className="textlink" href={DEPARTMENT_URL}>About the department <ArrowRight size={15}/></a><div className="programme-department"><h2>{CAREER_DEPARTMENT}</h2><p>Career readiness and professional development.</p></div></section><section><span className="eyebrow">REGISTRATION</span><h2>From application to batch</h2><ol><li>Choose a course and check the prerequisites.</li><li>Pre-apply or submit a batch application. Save your reference and tracking code.</li><li>Check your status online. Dates and payment instructions will be announced separately.</li></ol><a className="textlink" href="/apply#track">Track an application <ArrowRight size={15}/></a></section></div></section>
  </Frame>}
