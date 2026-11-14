@@ -17,7 +17,8 @@ export default async function CoursePage({params}:{params:Promise<{slug:string}>
  <div className="course-sidebar"><aside className="outcome"><h3>Learning objectives</h3><ul>{brief.objectives.map(item=><li key={item}>{item}</li>)}</ul><h3>Final project</h3><p>{c.outcome}</p></aside><aside className="outcome"><h3>Who should attend</h3><p>{brief.audience}</p><h3>Prerequisites</h3><p>{brief.prerequisite}</p><h3>Tools &amp; resources</h3><p>{c.tools}.</p><p>{brief.resources}</p></aside>
  <section className="outcome" aria-labelledby="course-referral-heading">
   <h3 id="course-referral-heading">Refer a friend</h3>
-  <p>Know someone who would benefit from this course? Share this page’s link so they can see what they’ll learn, check the batch schedule, and find out how to apply.</p>
+ <p><strong>Referral offer preview.</strong> Eligible referral partners each save ₹500 on a ₹2,500 course, bringing the fee to ₹2,000. Already paid? Your discount can apply to a future eligible course after your friend’s qualifying enrollment.</p>
+  <p>Offer pending approval. Share this page’s link with a friend to introduce them to the course.</p>
  </section></div></section>
  </Frame>;
 }
